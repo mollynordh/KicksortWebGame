@@ -26,17 +26,17 @@
             //player
             Quintus.Sprite.extend("Player",{
                 init: function(p) {
-                    this._super(p, { asset: "player.png", x: 110, y: 50, jumpSpeed: -600, lives: 3, coins: 0});
+                    this._super(p, { asset: "player.png", x: 110, y: 50, jumpSpeed: -600, lives: 3, cups: 0});
                     this.add("2d, platformerControls"); 
                     this.p.timeInvincible = 0;
 
                     this.on("hit.sprite",function(collision) {
-                        if(collision.obj.isA("Coin")) {
+                        if(collision.obj.isA("cup")) {
                             collision.obj.destroy();
-                            this.p.coins++;
-                            var coinsLabel = Quintus("UI.Text",1).items[1];
-                            coinsLabel.p.label = 'Coins x '+this.p.coins;
-                            if(this.p.coins === 15) {
+                            this.p.cups++;
+                            var cupsLabel = Quintus("UI.Text",1).items[1];
+                            cupsLabel.p.label = 'cups x '+this.p.cups;
+                            if(this.p.cups === 15) {
                                 Quintus.stageScene("gameWon",1); 
                                 this.destroy();
                             }
@@ -121,9 +121,9 @@
                 }
             });
             
-            Quintus.Sprite.extend("Coin", {
+            Quintus.Sprite.extend("cup", {
                 init: function(p) {
-                    this._super(p, {asset: "coin.png"});
+                    this._super(p, {asset: "cup.png"});
                 }            
             });
 
@@ -144,20 +144,20 @@
                     ["GroundEnemy", {x: 6*70, y: 6*70, asset: "bug.png"}],
                     ["GroundEnemy", {x: 25*70, y: 120, asset: "bug.png"}],
                     ["GroundEnemy", {x: 15*70, y: 120, asset: "bug.png"}],
-                    ["Coin", {x: 350, y: 300}],
-                    ["Coin", {x: 730, y: 100}],
-                    ["Coin", {x: 730, y: 520}],
-                    ["Coin", {x: 480, y: 100}],
-                    ["Coin", {x: 800, y: 300}],
-                    ["Coin", {x: 860, y: 300}],
-                    ["Coin", {x: 920, y: 300}],
-                    ["Coin", {x: 980, y: 300}],
-                    ["Coin", {x: 1040, y: 300}],
-                    ["Coin", {x: 1100, y: 300}],
-                    ["Coin", {x: 1160, y: 300}],
-                    ["Coin", {x: 1250, y: 400}],
-                    ["Coin", {x: 1310, y: 400}],
-                    ["Coin", {x: 1370, y: 400}]
+                    ["cup", {x: 350, y: 300}],
+                    ["cup", {x: 730, y: 100}],
+                    ["cup", {x: 730, y: 520}],
+                    ["cup", {x: 480, y: 100}],
+                    ["cup", {x: 800, y: 300}],
+                    ["cup", {x: 860, y: 300}],
+                    ["cup", {x: 920, y: 300}],
+                    ["cup", {x: 980, y: 300}],
+                    ["cup", {x: 1040, y: 300}],
+                    ["cup", {x: 1100, y: 300}],
+                    ["cup", {x: 1160, y: 300}],
+                    ["cup", {x: 1250, y: 400}],
+                    ["cup", {x: 1310, y: 400}],
+                    ["cup", {x: 1370, y: 400}]
                 ];
 
                 stage.loadAssets(levelAssets);  
@@ -196,8 +196,8 @@
                     y: 0
                 }),statsContainer);
                 
-                var coins = stage.insert(new Quintus.UI.Text({
-                    label: "Coins x 0",
+                var cups = stage.insert(new Quintus.UI.Text({
+                    label: "cups x 0",
                     color: "white",
                     x: 300,
                     y: 0
@@ -206,7 +206,7 @@
 
 
             //load assets
-            Quintus.load("tiles_map.png, player.png, bug.png, fly.png, level2.tmx, coin.png", function() {
+            Quintus.load("tiles_map.png, player.png, bug.png, fly.png, level2.tmx, cup.png", function() {
                 Quintus.sheet("tiles","tiles_map.png", { tilew: 70, tileh: 70});          
                 Quintus.stageScene("level1");
                 Quintus.stageScene("gameStats",1);
