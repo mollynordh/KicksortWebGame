@@ -14,7 +14,7 @@
     </head>
     <body style="background-color: black;">
         <script>
-            var Q = Quintus()
+            var Quintus = Quintus()
             .include("Sprites, Scenes, Input, 2D, Touch, UI")
             .setup({
                 width: 960,
@@ -24,27 +24,41 @@
 
 
             //player
-            Q.Sprite.extend("Player",{
+            Quintus.Sprite.extend("Player",{
                 init: function(p) {
-                    this._super(p, { asset: "player.png", x: 110, y: 50, jumpSpeed: -400});
-                    this.add("2d, platformerControls");              
+                    this._super(p, { asset: "player.png", x: 110, y: 50, jumpSpeed: -600, lives: 3, coins: 0});
+                    this.add("2d, platformerControls"); 
+                    this.p.timeInvincible = 0;
+
+                    this.on("hit.sprite",function(collision) {
+                        if(collision.obj.isA("Coin")) {
+                            collision.obj.destroy();
+                            this.p.coins++;
+                            var coinsLabel = Quintus("UI.Text",1).items[1];
+                            coinsLabel.p.label = 'Coins x '+this.p.coins;
+                            if(this.p.coins === 15) {
+                                Quintus.stageScene("gameWon",1); 
+                                this.destroy();
+                            }
+                        }
+                    });
                 },
                 step: function(dt) {
-                    if(Q.inputs["left"] && this.p.direction == "right") {
+                    if(Quintus.inputs["left"] && this.p.direction == "right") {
                         this.p.flip = "x";
                     } 
-                    if(Q.inputs["right"]  && this.p.direction == "left") {
+                    if(Quintus.inputs["right"]  && this.p.direction == "left") {
                         this.p.flip = false;                    
                     }
                 }                    
             });
 
-            Q.component("commonEnemy", {
+            Quintus.component("commonEnemy", {
                 added: function() {
                     var entity = this.entity;
                     entity.on("bump.left,bump.right,bump.bottom",function(collision) {
                         if(collision.obj.isA("Player")) {                        
-                            Q.stageScene("endGame",1, { label: "Game Over" }); 
+                            Quintus.stageScene("endGame",1, { label: "Game Over" }); 
                             collision.obj.destroy();
                         }
                     });
@@ -59,15 +73,16 @@
 
             });
        
-            Q.Sprite.extend("GroundEnemy", {
+            Quintus.Sprite.extend("GroundEnemy", {
                 init: function(p) {
                     this._super(p, {vx: -100, defaultDirection: "left"});
                     this.add("2d, aiBounce, commonEnemy");                
                 },
                 step: function(dt) {        
                     var dirX = this.p.vx/Math.abs(this.p.vx);
-                    var ground = Q.stage().locate(this.p.x, this.p.y + this.p.h/2 + 1, Q.SPRITE_DEFAULT);
-                    var nextTile = Q.stage().locate(this.p.x + dirX * this.p.w/2 + dirX, this.p.y + this.p.h/2 + 1, Q.SPRITE_DEFAULT);
+                    var ground = Quintus.stage().locate(this.p.x, this.p.y + this.p.h/2 + 1, Quintus.SPRITE_DEFAULT);
+                    var nextTile = Quintus.stage().locate(this.p.x + dirX * this.p.w/2 + dirX, this.p.y + this.p.h/2 + 1, Quintus.SPRITE_DEFAULT);
+                    
                     if(!nextTile && ground) {
                         if(this.p.vx > 0) {
                             if(this.p.defaultDirection == "right") {
@@ -90,7 +105,7 @@
                 }
             });
 
-            Q.Sprite.extend("VerticalEnemy", {
+            Quintus.Sprite.extend("VerticalEnemy", {
                 init: function(p) {
                     this._super(p, {vy: -100, rangeY: 200, gravity: 0 });
                     this.add("2d, commonEnemy");                
@@ -105,24 +120,44 @@
                     } 
                 }
             });
+            
+            Quintus.Sprite.extend("Coin", {
+                init: function(p) {
+                    this._super(p, {asset: "coin.png"});
+                }            
+            });
 
 
-            Q.scene("level1",function(stage) {
+            Quintus.scene("level1",function(stage) {
 
-                var background = new Q.TileLayer({ dataAsset: "level1.tmx", layerIndex: 0, sheet: "tiles", tileW: 70, tileH: 70, type: Q.SPRITE_NONE });
+                var background = new Quintus.TileLayer({ dataAsset: "level2.tmx", layerIndex: 0, sheet: "tiles", tileW: 70, tileH: 70, type: Quintus.SPRITE_NONE });
                 stage.insert(background);
 
-                stage.collisionLayer(new Q.TileLayer({ dataAsset: "level1.tmx", layerIndex:1,  sheet: "tiles", tileW: 70, tileH: 70, type: Q.SPRITE_DEFAULT }));
+                stage.collisionLayer(new Quintus.TileLayer({ dataAsset: "level2.tmx", layerIndex:1,  sheet: "tiles", tileW: 70, tileH: 70, type: Quintus.SPRITE_DEFAULT }));
 
-                var player = stage.insert(new Q.Player());
+                var player = stage.insert(new Quintus.Player());
 
                 var levelAssets = [
-                    ["GroundEnemy", {x: 30*70, y: 6*70, asset: "slime.png"}],
-                    ["VerticalEnemy", {x: 730, y: 280, rangeY: 180, asset: "fly.png"}],
+                    ["GroundEnemy", {x: 30*70, y: 6*70, asset: "bug.png"}],
+                    ["VerticalEnemy", {x: 735, y: 310, rangeY: 120, asset: "fly.png"}],
                     ["VerticalEnemy", {x: 1650, y: 200, rangeY: 180, asset: "fly.png"}],
-                    ["GroundEnemy", {x: 6*70, y: 3*70, asset: "slime.png"}],
-                    ["GroundEnemy", {x: 25*70, y: 120, asset: "slime.png"}],
-                    ["GroundEnemy", {x: 15*70, y: 120, asset: "slime.png"}]
+                    ["GroundEnemy", {x: 6*70, y: 6*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 25*70, y: 120, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 15*70, y: 120, asset: "bug.png"}],
+                    ["Coin", {x: 350, y: 300}],
+                    ["Coin", {x: 730, y: 100}],
+                    ["Coin", {x: 730, y: 520}],
+                    ["Coin", {x: 480, y: 100}],
+                    ["Coin", {x: 800, y: 300}],
+                    ["Coin", {x: 860, y: 300}],
+                    ["Coin", {x: 920, y: 300}],
+                    ["Coin", {x: 980, y: 300}],
+                    ["Coin", {x: 1040, y: 300}],
+                    ["Coin", {x: 1100, y: 300}],
+                    ["Coin", {x: 1160, y: 300}],
+                    ["Coin", {x: 1250, y: 400}],
+                    ["Coin", {x: 1310, y: 400}],
+                    ["Coin", {x: 1370, y: 400}]
                 ];
 
                 stage.loadAssets(levelAssets);  
@@ -130,17 +165,51 @@
                 stage.add("viewport").follow(player,{x: true, y: true},{minX: 0, maxX: background.p.w, minY: 0, maxY: background.p.h});
 
             });
-
-            Q.scene("endGame",function(stage) {
-                alert("game over");
+            
+            Quintus.scene("gameWon",function(stage) {
+                alert("You won!");
                 window.location = "";
+            })
+            
+            Quintus.scene("endGame",function(stage) {
+                alert("Denied");
+                window.location = "";
+            });
+            
+            Quintus.scene("gameStats",function(stage) {
+                var statsContainer = stage.insert(new Quintus.UI.Container({
+                    fill: "gray",
+                    x: 960/2,
+                    y: 620,
+                    border: 1,
+                    shadow: 3, 
+                    shadowColor: "rgba(0,0,0,0.5)",
+                    w: 960, 
+                    h: 40
+                    })
+                );
+                
+                var lives = stage.insert(new Quintus.UI.Text({
+                    label: "",
+                    color: "white",
+                    x: -300,
+                    y: 0
+                }),statsContainer);
+                
+                var coins = stage.insert(new Quintus.UI.Text({
+                    label: "Coins x 0",
+                    color: "white",
+                    x: 300,
+                    y: 0
+                }),statsContainer);
             });
 
 
             //load assets
-            Q.load("tiles_map.png, player.png, slime.png, fly.png, level1.tmx", function() {
-                Q.sheet("tiles","tiles_map.png", { tilew: 70, tileh: 70});          
-                Q.stageScene("level1");
+            Quintus.load("tiles_map.png, player.png, bug.png, fly.png, level2.tmx, coin.png", function() {
+                Quintus.sheet("tiles","tiles_map.png", { tilew: 70, tileh: 70});          
+                Quintus.stageScene("level1");
+                Quintus.stageScene("gameStats",1);
             });
 
 
