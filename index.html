@@ -119,6 +119,13 @@
                         this.p.vy = -this.p.vy;
                     } 
                 }
+            });            
+            
+            Quintus.Sprite.extend("Lamp", {
+                init: function(p) {
+                    this._super(p, {vy: -100, rangeY: 10, gravity: 0, asset: "lamp.png" });               
+                    this.p.initialY = this.p.y;
+                },
             });
             
             Quintus.Sprite.extend("cup", {
@@ -130,10 +137,10 @@
 
             Quintus.scene("level1",function(stage) {
 
-                var background = new Quintus.TileLayer({ dataAsset: "level2.tmx", layerIndex: 0, sheet: "tiles", tileW: 70, tileH: 70, type: Quintus.SPRITE_NONE });
+                var background = new Quintus.TileLayer({ dataAsset: "level1.tmx", layerIndex: 0, sheet: "tiles", tileW: 70, tileH: 70, type: Quintus.SPRITE_NONE });
                 stage.insert(background);
 
-                stage.collisionLayer(new Quintus.TileLayer({ dataAsset: "level2.tmx", layerIndex:1,  sheet: "tiles", tileW: 70, tileH: 70, type: Quintus.SPRITE_DEFAULT }));
+                stage.collisionLayer(new Quintus.TileLayer({ dataAsset: "level1.tmx", layerIndex:1,  sheet: "tiles", tileW: 70, tileH: 70, type: Quintus.SPRITE_DEFAULT}));
 
                 var player = stage.insert(new Quintus.Player());
 
@@ -157,7 +164,9 @@
                     ["cup", {x: 1160, y: 300}],
                     ["cup", {x: 1250, y: 400}],
                     ["cup", {x: 1310, y: 400}],
-                    ["cup", {x: 1370, y: 400}]
+                    ["cup", {x: 1370, y: 400}],
+                    
+                    ["Lamp", {x: 400, y: 400}],
                 ];
 
                 stage.loadAssets(levelAssets);  
@@ -206,8 +215,8 @@
 
 
             //load assets
-            Quintus.load("tiles_map.png, player.png, bug.png, fly.png, level2.tmx, cup.png", function() {
-                Quintus.sheet("tiles","tiles_map.png", { tilew: 70, tileh: 70});          
+            Quintus.load("tiles_map.png, lamp.png, player.png, bug.png, fly.png, level1.tmx, cup.png", function() {
+                Quintus.sheet("tiles","tiles_map.png", { tilew: 70, tileh: 70});            
                 Quintus.stageScene("level1");
                 Quintus.stageScene("gameStats",1);
             });
