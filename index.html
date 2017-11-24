@@ -17,7 +17,7 @@
             var Quintus = Quintus()
             .include("Sprites, Scenes, Input, 2D, Touch, UI")
             .setup({
-                width: 960,
+                width: 1400,
                 height: 640,
                 development: true
             }).controls().touch();            
@@ -26,7 +26,7 @@
             //player
             Quintus.Sprite.extend("Player",{
                 init: function(p) {
-                    this._super(p, { asset: "player.png", x: 110, y: 50, jumpSpeed: -600, lives: 3, cups: 0});
+                    this._super(p, { asset: "player.png", x: 1540, y: 50, jumpSpeed: -600, lives: 3, cups: 0});
                     this.add("2d, platformerControls"); 
                     this.p.timeInvincible = 0;
 
@@ -145,28 +145,8 @@
                 var player = stage.insert(new Quintus.Player());
 
                 var levelAssets = [
-                    ["GroundEnemy", {x: 30*70, y: 6*70, asset: "bug.png"}],
-                    ["VerticalEnemy", {x: 735, y: 310, rangeY: 120, asset: "fly.png"}],
-                    ["VerticalEnemy", {x: 1650, y: 200, rangeY: 180, asset: "fly.png"}],
-                    ["GroundEnemy", {x: 6*70, y: 6*70, asset: "bug.png"}],
-                    ["GroundEnemy", {x: 25*70, y: 120, asset: "bug.png"}],
-                    ["GroundEnemy", {x: 15*70, y: 120, asset: "bug.png"}],
-                    ["cup", {x: 350, y: 300}],
-                    ["cup", {x: 730, y: 100}],
-                    ["cup", {x: 730, y: 520}],
-                    ["cup", {x: 480, y: 100}],
-                    ["cup", {x: 800, y: 300}],
-                    ["cup", {x: 860, y: 300}],
-                    ["cup", {x: 920, y: 300}],
-                    ["cup", {x: 980, y: 300}],
-                    ["cup", {x: 1040, y: 300}],
-                    ["cup", {x: 1100, y: 300}],
-                    ["cup", {x: 1160, y: 300}],
-                    ["cup", {x: 1250, y: 400}],
-                    ["cup", {x: 1310, y: 400}],
-                    ["cup", {x: 1370, y: 400}],
                     
-                    ["Lamp", {x: 400, y: 400}],
+                    ["Lamp", {x: 1470, y: 400}],
                 ];
 
                 stage.loadAssets(levelAssets);  
@@ -188,12 +168,12 @@
             Quintus.scene("gameStats",function(stage) {
                 var statsContainer = stage.insert(new Quintus.UI.Container({
                     fill: "gray",
-                    x: 960/2,
+                    x: 300/2,
                     y: 620,
                     border: 1,
                     shadow: 3, 
                     shadowColor: "rgba(0,0,0,0.5)",
-                    w: 960, 
+                    w: 300, 
                     h: 40
                     })
                 );
@@ -208,7 +188,7 @@
                 var cups = stage.insert(new Quintus.UI.Text({
                     label: "cups x 0",
                     color: "white",
-                    x: 300,
+                    x: 2,
                     y: 0
                 }),statsContainer);
             });
