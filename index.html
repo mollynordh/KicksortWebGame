@@ -12,13 +12,14 @@
         <script src="lib/quintus_touch.js"></script>
         <script src="lib/quintus_ui.js"></script>
     </head>
-    <body style="background-color: black;">
+    <body style="background-color: white;">
         <script>
+            var timePlayed;
             var Quintus = Quintus()
             .include("Sprites, Scenes, Input, 2D, Touch, UI")
             .setup({
-                width: 1400,
-                height: 640,
+                width: 1000,
+                height: 800,
                 development: true
             }).controls().touch();            
 
@@ -26,21 +27,36 @@
             //player
             Quintus.Sprite.extend("Player",{
                 init: function(p) {
+                    timePlayed = 0;
+                    setInterval(function() { startTimer() }, 1000);
                     this._super(p, { asset: "player.png", x: 1540, y: 50, jumpSpeed: -600, lives: 3, cups: 0});
                     this.add("2d, platformerControls"); 
                     this.p.timeInvincible = 0;
-
                     this.on("hit.sprite",function(collision) {
                         if(collision.obj.isA("cup")) {
                             collision.obj.destroy();
                             this.p.cups++;
                             var cupsLabel = Quintus("UI.Text",1).items[1];
                             cupsLabel.p.label = 'cups x '+this.p.cups;
-                            if(this.p.cups === 15) {
-                                Quintus.stageScene("gameWon",1); 
-                                this.destroy();
-                            }
-                        }
+                        } else if (collision.obj.isA("goldenCup")){
+                                    collision.obj.destroy();
+                                    setTimeout(function() { Quintus.stageScene("gameWon",1); }, 200);
+                        } else if (collision.obj.isA("cup1")){
+                            collision.obj.destroy();
+                            this.p.cups++;
+                            var cupsLabel = Quintus("UI.Text",1).items[1];
+                            cupsLabel.p.label = 'cups x '+this.p.cups;
+                        } else if (this.p.cups === 3 && collision.obj.isA("Floor1")){
+                            collision.obj.destroy();
+                        } else if (this.p.cups === 6 && collision.obj.isA("Floor2")){
+                            collision.obj.destroy();
+                        } else if (this.p.cups === 10 && collision.obj.isA("Floor3")){
+                            collision.obj.destroy();
+                        } else if (this.p.cups === 15 && collision.obj.isA("Floor4")){
+                            collision.obj.destroy();
+                        } else if (this.p.cups === 21 && collision.obj.isA("Floor5")){
+                            collision.obj.destroy();
+                        } 
                     });
                 },
                 step: function(dt) {
@@ -52,13 +68,19 @@
                     }
                 }                    
             });
+            
+            function startTimer(){
+                timePlayed++;
+                var livesLabel = Quintus("UI.Text",1).first();
+                livesLabel.p.label = 'timer : '+timePlayed;
+            }
 
             Quintus.component("commonEnemy", {
                 added: function() {
                     var entity = this.entity;
                     entity.on("bump.left,bump.right,bump.bottom",function(collision) {
                         if(collision.obj.isA("Player")) {                        
-                            Quintus.stageScene("endGame",1, { label: "Game Over" }); 
+                            Quintus.stageScene("endGame",1); 
                             collision.obj.destroy();
                         }
                     });
@@ -128,11 +150,59 @@
                 },
             });
             
+            Quintus.Sprite.extend("Floor1", {
+                init: function(p) {
+                    this._super(p, {vy: -100, rangeY: 10, gravity: 0, asset: "floor.png" });               
+                    this.p.initialY = this.p.y;
+                },
+            });
+            
+            Quintus.Sprite.extend("Floor2", {
+                init: function(p) {
+                    this._super(p, {vy: -100, rangeY: 10, gravity: 0, asset: "floor.png" });               
+                    this.p.initialY = this.p.y;
+                },
+            });
+            
+            Quintus.Sprite.extend("Floor3", {
+                init: function(p) {
+                    this._super(p, {vy: -100, rangeY: 10, gravity: 0, asset: "floor.png" });               
+                    this.p.initialY = this.p.y;
+                },
+            });
+            
+            Quintus.Sprite.extend("Floor4", {
+                init: function(p) {
+                    this._super(p, {vy: -100, rangeY: 10, gravity: 0, asset: "floor.png" });               
+                    this.p.initialY = this.p.y;
+                },
+            });
+            
+            Quintus.Sprite.extend("Floor5", {
+                init: function(p) {
+                    this._super(p, {vy: -100, rangeY: 10, gravity: 0, asset: "floor.png" });               
+                    this.p.initialY = this.p.y;
+                },
+            });
+            
             Quintus.Sprite.extend("cup", {
                 init: function(p) {
                     this._super(p, {asset: "cup.png"});
                 }            
             });
+            
+            Quintus.Sprite.extend("cup1", {
+                init: function(p) {
+                    this._super(p, {asset: "cup.png"});
+                }            
+            });
+            
+            Quintus.Sprite.extend("goldenCup", {
+                init: function(p) {
+                    this._super(p, {asset: "goldenCup.png"});
+                }            
+            });
+
 
 
             Quintus.scene("level1",function(stage) {
@@ -146,7 +216,86 @@
 
                 var levelAssets = [
                     
-                    ["Lamp", {x: 1470, y: 400}],
+                    ["cup1", {x: 2270, y: 110}],
+                    
+                    // Level 1 
+                    ["Lamp", {x: 2400, y: 440}],
+                    ["Lamp", {x: 3100, y: 440}],
+                    ["VerticalEnemy", {x: 27*70, y: 8*70, rangeY: 100, asset: "fly.png"}],
+                    ["VerticalEnemy", {x: 38*70, y: 8*70, rangeY: 100, asset: "fly.png"}],
+                    ["cup", {x: 2400, y: 390}],
+                    ["cup", {x: 3100, y: 390}],
+                    ["Floor1", {x: 3255, y: 735}],
+                    ["Floor1", {x: 3325, y: 735}],
+                    
+                    // Level 2
+                    ["Lamp", {x: 1970, y: 930}],
+                    ["GroundEnemy", {x: 27*70, y: 17*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 41*70, y: 17*70, asset: "bug.png"}],
+                    ["cup", {x: 1970, y: 880}],
+                    ["cup", {x: 1800, y: 1090}],
+                    ["cup", {x: 2420, y: 1090}],
+                    ["Floor2", {x: 2485, y: 1225}],
+                    ["Floor2", {x: 2555, y: 1225}],
+                    
+                    // Level 3
+                    ["Lamp", {x: 3150, y: 1410}],
+                    ["GroundEnemy", {x: 30*70, y: 23*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 40*70, y: 18*70, asset: "bug.png"}],
+                    ["VerticalEnemy", {x: 23.5*70, y: 21*70, rangeY: 140, asset: "fly.png"}],
+                    ["cup", {x: 1500, y: 1440}],
+                    ["cup", {x: 1570, y: 1510}],
+                    ["cup", {x: 1920, y: 1580}],
+                    ["cup", {x: 2550, y: 1580}],
+                    ["Floor3", {x: 3325, y: 1715}],
+                    ["Floor3", {x: 3395, y: 1715}],
+                    
+                    // Level 4
+                    ["Lamp", {x: 1970, y: 1900}],
+                    ["Lamp", {x: 2440, y: 1900}],
+                    ["VerticalEnemy", {x: 23.5*70, y: 28*70, rangeY: 120, asset: "fly.png"}],
+                    ["GroundEnemy", {x: 30*70, y: 31*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 45*70, y: 31*70, asset: "bug.png"}],
+                    ["VerticalEnemy", {x: 39.5*70, y: 28*70, rangeY: 100, asset: "fly.png"}],
+                    ["cup", {x: 1500, y: 1930}],
+                    ["cup", {x: 2040, y: 2070}],
+                    ["cup", {x: 2440, y: 1850}],
+                    ["cup", {x: 2700, y: 2000}],
+                    ["cup", {x: 3250, y: 2070}],
+                    ["Floor4", {x: 2485, y: 2205}],
+                    ["Floor4", {x: 2555, y: 2205}],
+                    
+                    // Level 5
+                    ["Lamp", {x: 1890, y: 2390}],
+                    ["Lamp", {x: 2520, y: 2390}],
+                    ["GroundEnemy", {x: 25*70, y: 38*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 40*70, y: 38*70, asset: "bug.png"}],
+                    ["VerticalEnemy", {x: 29.5*70, y: 33.5*70, rangeY: 60, asset: "fly.png"}],
+                    ["VerticalEnemy", {x: 46.5*70, y: 34.5*70, rangeY: 60, asset: "fly.png"}],
+                    ["VerticalEnemy", {x: 23.5*70, y: 36*70, rangeY: 20, asset: "fly.png"}],
+                    ["cup", {x: 1890, y: 2340}],
+                    ["cup", {x: 2520, y: 2340}],
+                    ["cup", {x: 1500, y: 2420}],
+                    ["cup", {x: 2160, y: 2550}],
+                    ["cup", {x: 2500, y: 2550}],
+                    ["cup", {x: 2970, y: 2560}],
+                    ["Floor5", {x: 3325, y: 2695}],
+                    ["Floor5", {x: 3395, y: 2695}],
+                    
+                    // Level 6
+                    ["GroundEnemy", {x: 23*70, y: 45*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 25*70, y: 45*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 28*70, y: 45*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 36*70, y: 45*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 43*70, y: 45*70, asset: "bug.png"}],
+                    ["GroundEnemy", {x: 47*70, y: 45*70, asset: "bug.png"}],
+                    ["VerticalEnemy", {x: 23.5*70, y: 42*70, rangeY: 100, asset: "fly.png"}],
+                    ["VerticalEnemy", {x: 27.5*70, y: 41*70, rangeY: 90, asset: "fly.png"}],
+                    ["VerticalEnemy", {x: 40.5*70, y: 41*70, rangeY: 90, asset: "fly.png"}],
+                    ["VerticalEnemy", {x: 45.5*70, y: 42*70, rangeY: 100, asset: "fly.png"}],
+                    ["VerticalEnemy", {x: 32.5*70, y: 41*70, rangeY: 70, asset: "fly.png"}],
+                    ["VerticalEnemy", {x: 34.5*70, y: 41*70, rangeY: 90, asset: "fly.png"}],
+                    ["goldenCup", {x: 2340, y: 2910}],
                 ];
 
                 stage.loadAssets(levelAssets);  
@@ -167,35 +316,32 @@
             
             Quintus.scene("gameStats",function(stage) {
                 var statsContainer = stage.insert(new Quintus.UI.Container({
-                    fill: "gray",
-                    x: 300/2,
-                    y: 620,
-                    border: 1,
-                    shadow: 3, 
-                    shadowColor: "rgba(0,0,0,0.5)",
-                    w: 300, 
-                    h: 40
+                    fill: "black",
+                    x: 100,
+                    y: 70,
+                    w: 150, 
+                    h: 90
                     })
                 );
                 
                 var lives = stage.insert(new Quintus.UI.Text({
-                    label: "",
-                    color: "white",
-                    x: -300,
+                    label: "timer : 0",
+                    color: "lightgreen",
+                    x: -15,
                     y: 0
                 }),statsContainer);
                 
                 var cups = stage.insert(new Quintus.UI.Text({
-                    label: "cups x 0",
-                    color: "white",
-                    x: 2,
-                    y: 0
+                    label: "cups : 0",
+                    color: "lightgreen",
+                    x: -20,
+                    y: -30
                 }),statsContainer);
             });
 
 
-            //load assets
-            Quintus.load("tiles_map.png, lamp.png, player.png, bug.png, fly.png, level1.tmx, cup.png", function() {
+            //Load assets
+            Quintus.load("tiles_map.png, lamp.png, player.png, bug.png, fly.png, level1.tmx, cup.png, goldenCup.png, floor.png", function() {
                 Quintus.sheet("tiles","tiles_map.png", { tilew: 70, tileh: 70});            
                 Quintus.stageScene("level1");
                 Quintus.stageScene("gameStats",1);
